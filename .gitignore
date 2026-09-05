@@ -29,3 +29,5 @@ resolve_packages.log
 resolve2.log
 verify_compile.log
 create_from_template.log
+
+temp_editor_backup/
