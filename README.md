@@ -55,6 +55,8 @@
   -logFile build_webgl.log
 ```
 
+![Команда запуска автоматической сборки через CLI](screenshots/05_cli_command.png)
+
 ### Разбор флагов:
 | Флаг | Назначение |
 |------|-----------|
@@ -76,6 +78,8 @@
 [CI/CD] Build time: 11,00 sec. Size: 17205113 bytes.
 `
 
+![Результат из лог-файла build_webgl.log](screenshots/06_build_log.png)
+
 ### Структура WebGL-билда (Builds/WebGL/):
 `
 Builds/WebGL/
@@ -91,6 +95,8 @@ Builds/WebGL/
     └── ...
 `
 
+![Структура папки Builds/WebGL/](screenshots/07_build_output.png)
+
 Сжатие отключено — файлы без .gz / .br суффиксов.
 
 ## Шаг 7: Проверка работоспособности (Локальный запуск)
@@ -101,6 +107,8 @@ Builds/WebGL/
 2. Запустить расширение Live Server (кнопка «Go Live»)
 3. Браузер откроет http://127.0.0.1:5500/index.html
 4. Игра загружается и отображается корректно
+
+![Запущенная WebGL-сборка в браузере (полоса загрузки дошла до конца, сцена проекта)](screenshots/08_game_running.png)
 
 > **Внимание:** Двойной клик по index.html не работает из-за CORS-политик браузера.
 
@@ -125,6 +133,10 @@ Builds/WebGL/
 ## Шаг 9: Документирование и Pull Request
 
 Данный README.md является отчётом по лабораторной работе.
+
+Pull Request #1 слит после ревью:
+
+![Pull Request #1 — слит (merged)](screenshots/pr_merged.png)
 
 ---
 
