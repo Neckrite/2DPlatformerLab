@@ -32,3 +32,4 @@ create_from_template.log
 
 # WebGL build artifacts (recreated locally by Unity)
 Builds/
+temp_editor_backup/
