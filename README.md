@@ -1,9 +1,19 @@
-# Лабораторная работа №1: Автоматизация сборки 2D игры через CLI
+# 2D Platformer Lab — АРПО (лабораторные работы)
 
-## Цель работы
-Освоить автоматизацию сборки Unity-проекта через интерфейс командной строки (CLI), научиться использовать BuildPipeline.BuildPlayer() для программной компиляции WebGL-билда, и настроить Git-репозиторий с ветвлением и Pull Request.
+Проект 2D-платформера (Unity 6) с DevOps-инфраструктурой: автоматическая сборка WebGL, CI/CD на GitHub Actions (Sanity Check + зеркалирование), Docker-контейнеризация веб-сервера Nginx для раздачи Gzip-сборки.
+
+**Играть онлайн:** <https://neckrite.github.io/2DPlatformerLab/> · **CI:** [Actions](https://github.com/Neckrite/2DPlatformerLab/actions) · **Registry:** [Packages](https://github.com/Neckrite?tab=packages)
+
+| Лабораторная работа | Тема | Отчёт |
+|---|---|---|
+| ЛР №1 | Автоматизация сборки 2D игры через CLI | [LR1.md](LR1.md) |
+| ЛР №2 | Репозитории GitHub, Sanity Check и зеркалирование | [LR2.md](LR2.md) |
+| ЛР №3 | Docker + Nginx: раздача сжатой WebGL-сборки | [LR3.md](LR3.md) |
 
 ---
+
+# Подробные шаги
+
 
 ## Шаг 1: Инициализация проекта
 
