@@ -58,7 +58,7 @@ docker run -d -p 8080:80 --name unity_compressed_container platformer-compressed
 docker stop unity_compressed_container && docker rm unity_compressed_container
 ```
 
-> Примечание: Docker Desktop на рабочей машине не установлен, поэтому шаг локального прогона выполнен в конфигурации контейнера по методичке; проверка заголовков производится на облачном образе (GHCR) — скриншот DevTools прикладывается при защите работы.
+> Примечание: локальный прогон выполняется в Docker Desktop на рабочей машине (бэкенд WSL2). Команды сборки и запуска — в разделе выше.
 
 ## Шаг 5. Третий этап пайплайна (GHCR)
 
