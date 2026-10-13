@@ -9,6 +9,7 @@
 | ЛР №1 | Автоматизация сборки 2D игры через CLI | [LR1.md](LR1.md) |
 | ЛР №2 | Репозитории GitHub, Sanity Check и зеркалирование | [LR2.md](LR2.md) |
 | ЛР №3 | Docker + Nginx: раздача сжатой WebGL-сборки | [LR3.md](LR3.md) |
+| ЛР №4 | Автоматизация тестирования (Unity Test Runner) в CI/CD | [LR4.md](LR4.md) |
 
 ---
 
