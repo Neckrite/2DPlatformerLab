@@ -107,9 +107,9 @@ jobs:
           git push --force https://x-access-token:${BACKUP_TOKEN}@github.com/Neckrite/2DPlatformerLab_backup.git main
           echo "=== Код успешно продублирован ==="
 
-  # Задача 3: сборка и публикация Docker-образа веб-сервера (Nginx + Unity WebGL Gzip) в GHCR
+  # Задача 4: сборка и публикация Docker-образа веб-сервера (Nginx + Unity WebGL Gzip) в GHCR
   docker_ghcr:
-    needs: sanity_check # образ собирается только для проверенного кода
+    needs: run_tests # образ собирается ТОЛЬКО если все тесты прошли успешно
     if: github.repository == 'Neckrite/2DPlatformerLab'
     runs-on: ubuntu-latest
     permissions:
