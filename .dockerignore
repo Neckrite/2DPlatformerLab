@@ -1,0 +1,11 @@
+# Сборочный контекст Docker: не отправлять в демон лишнее
+Library/
+Logs/
+Temp/
+UserSettings/
+obj/
+.git/
+*.log
+*.docx
+*.bat
+*.py

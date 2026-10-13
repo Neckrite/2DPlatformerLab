@@ -58,7 +58,17 @@ docker run -d -p 8080:80 --name unity_compressed_container platformer-compressed
 docker stop unity_compressed_container && docker rm unity_compressed_container
 ```
 
-> Примечание: локальный прогон выполняется в Docker Desktop на рабочей машине (бэкенд WSL2). Команды сборки и запуска — в разделе выше.
+> Примечание: локальный прогон выполнен в Docker Desktop (бэкенд WSL2). Образ собран за ~10 с (106 МБ), контейнер запущен с пробросом порта 8080->80. Проверка заголовков:
+
+```
+$ curl -sI http://localhost:8080/Build/WebGL.wasm.gz
+HTTP/1.1 200 OK
+Content-Type: application/wasm
+Content-Encoding: gzip
+Cache-Control: public, max-age=31536000, immutable
+```
+
+Аналогично `.data.gz -> application/octet-stream`, `.framework.js.gz -> application/javascript` (все с `Content-Encoding: gzip`). Игра загружается и работает на `http://localhost:8080`. Добавлен `.dockerignore`, чтобы папки `Library/`, `Logs/`, `Temp/` не попадали в сборочный контекст.
 
 ## Шаг 5. Третий этап пайплайна (GHCR)
 
