@@ -33,6 +33,11 @@ public static class BuildManager
         {
             Debug.Log("[CI/CD] SUCCESS! WebGL build created successfully.");
             Debug.Log("[CI/CD] Build time: " + summary.totalTime.TotalSeconds.ToString("F2") + " sec. Size: " + summary.totalSize + " bytes.");
+            // Маркеры, которые ожидает game-ci CLI (validateBuild):
+            Debug.Log("Build succeeded!");
+            Debug.Log("# Build results #");
+            Debug.Log("Errors: " + summary.totalErrors);
+            Debug.Log("Size: " + summary.totalSize + " bytes.");
             ExitWithCode(0);
         }
         else
