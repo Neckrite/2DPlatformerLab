@@ -1,5 +1,6 @@
-# Основной пайплайн автоматизации проекта: проверка структуры (Sanity Check)
-# и зеркалирование репозитория в резервный контур (Disaster Recovery).
+# Основной пайплайн автоматизации проекта: проверка структуры (Sanity Check),
+# тесты (ЛР №4), облачная компиляция игры и деплой на GitHub Pages (ЛР №5),
+# Docker-образ с настоящей игрой в GHCR и зеркалирование (Disaster Recovery).
 name: Unity 2D Platformer CI/CD
 
 # Триггер запуска: реакция на любой push в основную ветку main
@@ -76,16 +77,57 @@ jobs:
           name: test-results
           path: artifacts/
 
-  # Задача 3: автоматическое зеркалирование в резервный репозиторий
+  # Задача 3 (ЛР №5): настоящая компиляция игры в облаке.
+  # game-ci/unity-builder поднимает контейнер Unity 6, активирует лицензию и
+  # вызывает C# метод BuildManager.BuildWebGL из ЛР №1.
+  build_game:
+    needs: run_tests # запустится только если тесты из ЛР №4 прошли успешно
+    runs-on: ubuntu-latest
+    outputs:
+      build_status: ${{ job.status }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          lfs: true # в игре могут быть тяжелые бинарные ассеты
+
+      # Кэшируем Library, чтобы компиляция не шла вечность (25-30 мин -> 2-3 мин)
+      - uses: actions/cache@v4
+        with:
+          path: Library
+          key: Library-Build-${{ hashFiles('Packages/packages-lock.json', 'Assets/**/*.asmdef') }}
+
+      # Вызываем облачный компилятор Unity 6 от GameCI
+      - name: Build WebGL Player
+        uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          targetPlatform: WebGL
+          # Вызов C# метода автоматизации из Лабораторной работы №1
+          buildMethod: BuildManager.BuildWebGL
+          # Версия Unity указывается явно: ProjectVersion.txt в .gitignore
+          unityVersion: 6000.4.8f1
+
+      # Сохраняем НАСТОЯЩИЕ скомпилированные файлы во временное облачное хранилище
+      - name: Upload WebGL Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: WebGL-Build
+          path: Builds/WebGL
+
+  # Задача 4: автоматическое зеркалирование в резервный репозиторий
   mirror_repo:
     needs: run_tests # зеркалирование начнется только после успешных тестов
-    if: github.repository == 'Neckrite/2DPlatformerLab' # выполняется только в основном репозитории, чтобы избежать цикла в backup
+    if: github.repository == 'Neckrite/2DPlatformerLab' # только в основном репозитории, чтобы избежать цикла в backup
     runs-on: ubuntu-latest
     steps:
       - name: Checkout full history
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # скачиваем всю историю коммитов для корректного зеркалирования
+          fetch-depth: 0 # скачиваем полную историю коммитов для корректного зеркалирования
           persist-credentials: false # отключаем credential helper, чтобы GITHUB_TOKEN не конфликтовал с PAT
 
       - name: Verify token is set
@@ -107,9 +149,9 @@ jobs:
           git push --force https://x-access-token:${BACKUP_TOKEN}@github.com/Neckrite/2DPlatformerLab_backup.git main
           echo "=== Код успешно продублирован ==="
 
-  # Задача 4: сборка и публикация Docker-образа веб-сервера (Nginx + Unity WebGL Gzip) в GHCR
-  docker_ghcr:
-    needs: run_tests # образ собирается ТОЛЬКО если все тесты прошли успешно
+  # Задача 5 (ЛР №5): сборка Docker-образа с НАСТОЯЩЕЙ игрой вместо заглушек
+  build_docker_image:
+    needs: build_game # теперь ждем полноценного билда игры
     if: github.repository == 'Neckrite/2DPlatformerLab'
     runs-on: ubuntu-latest
     permissions:
@@ -119,14 +161,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Create placeholder WebGL build (Builds/ отсечён .gitignore)
-        run: |
-          mkdir -p Builds/WebGL/Build
-          echo '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Platformer WebGL</title></head><body>Placeholder build (real build is produced locally by Unity)</body></html>' > Builds/WebGL/index.html
-          touch Builds/WebGL/Build/WebGL.loader.js.gz
-          touch Builds/WebGL/Build/WebGL.framework.js.gz
-          touch Builds/WebGL/Build/WebGL.wasm.gz
-          touch Builds/WebGL/Build/WebGL.data.gz
+      # Вместо генерации фейковых заглушек (touch) скачиваем живой билд из build_game
+      - name: Download WebGL Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: WebGL-Build
+          path: Builds/WebGL
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -136,7 +176,7 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ secrets.GITHUB_TOKEN }} # системный автоматический токен GitHub
 
       - name: Build and push image
         uses: docker/build-push-action@v6
@@ -146,3 +186,28 @@ jobs:
           tags: |
             ghcr.io/neckrite/platformer-webgl:latest
             ghcr.io/neckrite/platformer-webgl:${{ github.sha }}
+
+  # Задача 6 (ЛР №5): автоматический деплой игры на GitHub Pages
+  deploy_to_pages:
+    needs: build_game # деплоим только успешно собранную игру
+    if: github.repository == 'Neckrite/2DPlatformerLab'
+    runs-on: ubuntu-latest
+    # Публикация в ветку gh-pages требует прав на запись содержимого репозитория
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download WebGL Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: WebGL-Build
+          path: Builds/WebGL
+
+      # Публикуем папку Builds/WebGL в специальную служебную ветку gh-pages
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: Builds/WebGL
+          branch: gh-pages # ветка для хостинга страниц
