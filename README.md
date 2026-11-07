@@ -11,6 +11,7 @@
 | ЛР №3 | Docker + Nginx: раздача сжатой WebGL-сборки | [LR3.md](LR3.md) |
 | ЛР №4 | Автоматизация тестирования (Unity Test Runner) в CI/CD | [LR4.md](LR4.md) |
 | ЛР №5 | Облачная компиляция WebGL + деплой на GitHub Pages | [LR5.md](LR5.md) |
+| ЛР №6 | Мониторинг пайплайна и Telegram-оповещения | [LR6.md](LR6.md) |
 
 ---
 
