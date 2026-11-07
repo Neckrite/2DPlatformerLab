@@ -51,7 +51,6 @@ public class PlayerMechanicsTests
 
         // Имитируем нажатие «вправо» (клавиша D): игрок должен поехать вправо
         player.ApplyInput(1f);
-        Assert.AreEqual(1, 2, "ВРЕМЕННО СЛОМАНО для демонстрации гейта пайплайна");
         Assert.Greater(rb.velocity.x, 0f,
             "Ошибка: при controlEnabled = true ввод «вправо» должен двигать игрока вправо!");
         float speedRight = rb.velocity.x;
